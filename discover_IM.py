@@ -5,7 +5,10 @@ from pm4py.objects.petri_net.exporter import exporter as pnml_exporter
 
 
 def discover_IM(log_file, noise_threshold=0.2, verbose=False):
-
+    """
+    Discovers a petri net model from log using the Inductive Miner with specified noise threshold. The resulting model
+    is written into file
+    """
     log = xes_importer.apply(log_file)
     model, im, fm = pm4py.discover_petri_net_inductive(log, noise_threshold)
 
