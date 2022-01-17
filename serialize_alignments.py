@@ -1,9 +1,11 @@
 import argparse
+import os
 
 from pm4py.algo.conformance.alignments.petri_net import algorithm as alignments
 from pm4py.objects.log.importer.xes import importer as xes_importer
 import pickle
 import pm4py
+from tqdm import tqdm
 
 SEQUENCE_DELIMITER = " >> "
 
@@ -55,36 +57,40 @@ def get_event_sequence(trace):
     return event_representation
 
 
-def serialize_alignments(log_file, model_file, threads=1, verbose=False):
+def serialize_alignments(log_file, net_files, threads=1, verbose=False):
     """
     Constructs the alignments for log_file w.r.t model_file. The resulting alignment are written into file maintining
     the same order as the traces in the original log file
     """
     log = xes_importer.apply(log_file)
-    net, im, fm = pm4py.read_pnml(model_file)
 
-    alignment_params = init_alignment_params(net, threads)
+    for i in tqdm(range(len(net_files)), desc=" > Discovering Models", disable=False):
+        net_file = net_files[i]
 
-    trace_indices = []
-    for idx, trace in enumerate(log):
-        trace_indices.append(idx)
+        net, im, fm = pm4py.read_pnml(net_file)
+        alignment_params = init_alignment_params(net, threads)
 
-    # Only compute alignments for traces with length <= 100
-    # short_trace_indices = []
-    # for idx, trace in enumerate(log):
-    #    if len(trace) <= 100:
-    #        short_trace_indices.append(idx)
+        trace_indices = []
+        for idx, trace in enumerate(log):
+            trace_indices.append(idx)
 
-    aligned_traces = []
-    if alignment_params[alignments.Parameters.CORES] == 1:
-        aligned_traces = alignments.apply_log([log[x] for x in trace_indices[:]], net, im, fm,
-                                              parameters=alignment_params)
-    else:
-        # simply iterate over all traces, this is a bit convoluted though
-        aligned_traces = alignments.apply_multiprocessing([log[x] for x in trace_indices[:]], net, im, fm,
-                                                          parameters=alignment_params)
-    pickle.dump(aligned_traces, open(log_file + "_" + model_file + ".align", "wb"))
-    pickle.dump(trace_indices, open(log_file + "_" + model_file + ".indices", "wb"))
+        # Only compute alignments for traces with length <= 100
+        # short_trace_indices = []
+        # for idx, trace in enumerate(log):
+        #    if len(trace) <= 100:
+        #        short_trace_indices.append(idx)
+
+        aligned_traces = []
+        if alignment_params[alignments.Parameters.CORES] == 1:
+            aligned_traces = alignments.apply_log([log[x] for x in trace_indices[:]], net, im, fm,
+                                                  parameters=alignment_params)
+        else:
+            # simply iterate over all traces, this is a bit convoluted though
+            aligned_traces = alignments.apply_multiprocessing([log[x] for x in trace_indices[:]], net, im, fm,
+                                                              parameters=alignment_params)
+
+        pickle.dump(aligned_traces, open(os.path.splitext(log_file)[0] + "_" + os.path.splitext(net_file)[0] + ".align", "wb"))
+        pickle.dump(trace_indices, open(os.path.splitext(log_file)[0] + "_" + os.path.splitext(net_file)[0] + ".indices", "wb"))
 
 
 def zip_log_and_alignments(log, aligned_traces_file, index_file):
@@ -103,8 +109,8 @@ def zip_log_and_alignments(log, aligned_traces_file, index_file):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("log_file", help="the name of the .xes-log")
-    parser.add_argument("model_file", help="the name of the .pnml-model")
-    parser.add_argument("--threads", help="number of threads to use", type=int)
+    parser.add_argument("-net_files", help="the names of the .pnml-models for which to construct alignments")
+    parser.add_argument("--threads", help="number of threads to use", type=int, nargs='+', required=True)
     parser.add_argument("--verbose", help="increase verbosity of output", action="store_true")
     args = parser.parse_args()
 
