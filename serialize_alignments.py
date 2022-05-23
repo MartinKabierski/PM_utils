@@ -42,8 +42,9 @@ def serialize_alignments(log_file, net_files, threads=1):
     the same order as the traces in the original log file
     """
     log = xes_importer.apply(log_file)
-
     for i in (range(len(net_files))):
+        print()
+
         net_file = net_files[i]
         print(net_file)
         net, im, fm = pnml_importer.apply(net_file)
@@ -55,7 +56,7 @@ def serialize_alignments(log_file, net_files, threads=1):
             end = timer()
             log_fitness = evaluator.evaluate(aligned_traces, variant=evaluator.Variants.ALIGNMENT_BASED)
             print(log_fitness)
-            print("TIME: "+str(end-start))
+            print("Elapsed time: "+str(end-start))
         else:
             # simply iterate over all traces, this is a bit convoluted though
             start = timer()
@@ -65,8 +66,7 @@ def serialize_alignments(log_file, net_files, threads=1):
             end = timer()
             log_fitness = evaluator.evaluate(aligned_traces, variant=evaluator.Variants.ALIGNMENT_BASED)
             print(log_fitness)
-            print("TIME: "+str(end-start))
-
+            print("Elapsed time: "+str(end-start))
         pickle.dump(aligned_traces,
                     open(os.path.splitext(log_file)[0] + "_" + os.path.splitext(net_file)[0] + ".align", "wb"))
 
