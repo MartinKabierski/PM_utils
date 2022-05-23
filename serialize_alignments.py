@@ -70,11 +70,20 @@ def serialize_alignments(log_file, net_files, threads=1):
         pickle.dump(aligned_traces,
                     open(os.path.splitext(log_file)[0] + "_" + os.path.splitext(net_file)[0] + ".align", "wb"))
 
-def zip_log_and_alignments(log, aligned_traces_file, index_file):
+
+def deserialize_alignments(file_name):
+    """
+    Loads and returns alignments from a serialized file
+    """
+    aligned_traces = pickle.load(open(file_name, "rb"))
+    return aligned_traces
+
+
+def zip_log_and_alignments(log, file_name, index_file):
     """
     Returns a dict, consisting of string representations of the log traces as keys, and their alignments as values.
     """
-    aligned_traces = pickle.load(open(aligned_traces_file, "rb"))
+    aligned_traces = pickle.load(open(file_name, "rb"))
     trace_keys = []
     for trace in log:
         trace_keys.append(get_event_sequence(trace))
