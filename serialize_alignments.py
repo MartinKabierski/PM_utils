@@ -4,6 +4,7 @@ import os
 from pm4py.algo.conformance.alignments.petri_net import algorithm as alignments
 from pm4py.objects.log.importer.xes import importer as xes_importer
 from pm4py.objects.petri_net.utils import align_utils as utils
+from pm4py.objects.petri_net.importer import importer as pnml_importer
 import pickle
 import pm4py
 
@@ -59,7 +60,7 @@ def get_event_sequence(trace):
     return event_representation
 
 
-def serialize_alignments(log_file, net_files, threads=1, verbose=False):
+def serialize_alignments(log_file, net_files, threads=1):
     """
     Constructs the alignments for log_file w.r.t model_file. The resulting alignment are written into file maintining
     the same order as the traces in the original log file
@@ -69,7 +70,7 @@ def serialize_alignments(log_file, net_files, threads=1, verbose=False):
     for i in (range(len(net_files))):
         net_file = net_files[i]
         print(net_file)
-        net, im, fm = pm4py.read_pnml(net_file)
+        net, im, fm = pnml_importer.apply(net_file)
         alignment_params = init_alignment_params(log, net, threads)
 
         if alignment_params[alignments.Parameters.CORES] == 1:
@@ -102,7 +103,6 @@ if __name__ == '__main__':
     parser.add_argument("-nets", help="the names of the .pnml-models for which to construct alignments", nargs='+',
                         required=True)
     parser.add_argument("--threads", help="number of threads to use", type=int)
-    parser.add_argument("--verbose", help="increase verbosity of output", action="store_true")
     args = parser.parse_args()
 
-    serialize_alignments(args.logs, args.nets, args.threads, args.verbose)
+    serialize_alignments(args.logs, args.nets, args.threads)

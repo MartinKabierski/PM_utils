@@ -2,8 +2,9 @@ import argparse
 import os
 
 import pm4py
-from pm4py.objects.log.importer.xes import importer as xes_importer
 from pm4py.objects.petri_net.exporter import exporter as pnml_exporter
+from pm4py.objects.log.importer.xes import importer as xes_importer
+
 from tqdm import tqdm
 
 
