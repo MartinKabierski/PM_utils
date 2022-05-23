@@ -12,7 +12,7 @@ import pickle
 SEQUENCE_DELIMITER = " >> "
 
 
-def init_alignment_params(log, model, threads):
+def init_alignment_params(log, model, threads=1):
     """
     Sets common parameters for alignment computation using unit cost function.
     """
