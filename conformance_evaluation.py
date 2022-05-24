@@ -21,7 +21,7 @@ def plot_fitness_distribution(traces):
 def estimate_standard_error(alignments):
     sample_sizes = [100, 200, 300, 400, 500]
     #get log fitness
-    fitness = get_log_conformance(alignments)
+    fitness = get_log_conformance(alignments)["log_fitness"]
     #get standard deviation
     trace_fitness = [x["log_fitness"] for x in alignments]
     stddev = sqrt(1/len(alignments) * sum([pow(fitness - x, 2) for x in trace_fitness]))
