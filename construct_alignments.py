@@ -51,7 +51,6 @@ def serialize_alignments(log_file, net_files, threads=1):
         start = timer()
         aligned_traces = construct_alignments(log, net, im, fm, threads)
         end = timer()
-
         print(evaluator.evaluate(aligned_traces, variant=evaluator.Variants.ALIGNMENT_BASED))
         print("Elapsed time: " + str(end - start))
 
