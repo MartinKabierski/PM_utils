@@ -77,7 +77,7 @@ def get_event_sequence(trace):
     return event_representation
 
 
-def zip_log_and_alignments(log, alignments, index_file):
+def zip_log_and_alignments(log, alignments):
     """
     Returns a dict, consisting of string representations of the log traces as keys, and their alignments as values.
     """
