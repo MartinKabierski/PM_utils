@@ -29,7 +29,7 @@ def init_alignment_params(log, model, threads=1):
 def construct_alignments(log, net, im, fm, threads=1):
     alignment_params = init_alignment_params(log, net, threads)
     if alignment_params[alignments.Parameters.CORES] == 1:
-        return alignments.apply_log(log, net, im, fm, parameters=alignment_params)
+        return alignments.apply(log, net, im, fm, parameters=alignment_params)
     else:
         return alignments.apply_multiprocessing(log, net, im, fm,
                                                 parameters=alignment_params)
